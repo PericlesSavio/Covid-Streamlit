@@ -1,5 +1,5 @@
 import streamlit as st
-exec(open('covid.py').read())
+exec(open('covid.py', encoding="latin-1").read())
 
 
 # reorganizando df
