@@ -1,5 +1,5 @@
 import streamlit as st
-exec(open('covid.py', encoding="latin-1").read())
+exec(open('covid.py', encoding="iso-8859-1").read())
 
 
 # reorganizando df
@@ -27,7 +27,7 @@ df_base = df_base.rename(columns={
 
 st.set_page_config(
      page_title='COVID-19 Dashboard',
-     layout="centered",
+     layout="wide",
      initial_sidebar_state="expanded",
 )
 
