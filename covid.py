@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 # bibliotecas
 import plotly.express as px
 import pandas as pd
