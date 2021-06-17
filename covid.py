@@ -138,6 +138,4 @@ brmapa_vacinados2.update_layout({
 
 
 
-
-
 ###########
