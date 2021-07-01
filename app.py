@@ -2,8 +2,6 @@
 
 ## bibliotecas / config / covid.py
 import streamlit as st
-import locale
-locale.setlocale(locale.LC_ALL, "Portuguese_Brazil.1252")
 exec(open('covid.py', encoding="iso-8859-1").read())
 
 
@@ -19,8 +17,8 @@ st.set_page_config(
 def dados(text, number):
      st.sidebar.markdown(f'<p>{text} <b style="background-color:#2c4d56;color:#09ab3b;font-size:18px;border-radius:0.25rem;">{number}</b></p>', unsafe_allow_html=True)
 
-def formato(n):
-    return locale.format('%.0f', n, grouping=True)
+def formato(n,d):
+    return f'{n:_.{d}f}'.replace('.',',').replace('_','.')
 
 vac1 = mapa_brasil(z = df_estados_24h.vaccinated_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
                     title_text='Percentual de<br>vacinados com a 1ª dose.')
@@ -28,11 +26,11 @@ vac1 = mapa_brasil(z = df_estados_24h.vaccinated_per_100_inhabitants, hovertempl
 vac2 = mapa_brasil(z = df_estados_24h.vaccinated_second_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
                     title_text='Percentual de<br>vacinados com a 2ª dose.')
 
-casos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newCases.sort_values(ascending=False), hovertext=formato(df_estados_24h_soma.newCases),
-            title = "Casos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newCases)), xaxis_title="Estados", yaxis_title="Nº de casos")
+casos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newCases.sort_values(ascending=False), hovertext=formato(df_estados_24h_soma.newCases, 0),
+            title = "Casos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newCases, 0)), xaxis_title="Estados", yaxis_title="Nº de casos")
 
-obitos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newDeaths, hovertext=formato(df_estados_24h_soma.newDeaths),
-            title = "Óbitos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newDeaths)), xaxis_title="Estados", yaxis_title="Nº de óbitos")
+obitos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newDeaths, hovertext=formato(df_estados_24h_soma.newDeaths, 0),
+            title = "Óbitos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newDeaths, 0)), xaxis_title="Estados", yaxis_title="Nº de óbitos")
 
 
 
@@ -51,16 +49,16 @@ def cs_sidebar():
     st.sidebar.header('COVID-19 Resumo')
     dados('Dia:', ontem_str)
     st.sidebar.markdown("""---""")
-    dados('Casos nas últimas 24h:', formato(df_estados_24h_soma.newCases))
-    dados('Óbitos nas últimas 24h:', formato(df_estados_24h_soma.newDeaths))
+    dados('Casos nas últimas 24h:', formato(df_estados_24h_soma.newCases, 0))
+    dados('Óbitos nas últimas 24h:', formato(df_estados_24h_soma.newDeaths, 0))
     st.sidebar.markdown("""---""")
-    dados('Casos totais:', locale.format('%.0f', df_estados_24h_soma.totalCases, grouping=True))
-    dados('Óbitos totais:', locale.format('%.0f', df_estados_24h_soma.deaths, grouping=True))
+    dados('Casos totais:', formato(df_estados_24h_soma.totalCases, 0))
+    dados('Óbitos totais:', formato(df_estados_24h_soma.deaths, 0))
     st.sidebar.markdown("""---""")
-    dados('Vacinas aplicadas:', locale.format('%.0f', df_estados_24h_soma.vaccinated+df_estados_24h_soma.vaccinated_second, grouping=True))
-    dados('Primeira dose:', locale.format('%.0f', df_estados_24h_soma.vaccinated, grouping=True))
+    dados('Vacinas aplicadas:', formato(df_estados_24h_soma.vaccinated+df_estados_24h_soma.vaccinated_second, 0))
+    dados('Primeira dose:', formato(df_estados_24h_soma.vaccinated, 0))
     st.sidebar.progress(df_estados_24h_soma.vaccinated/214693448)
-    dados('Segunda dose:', locale.format('%.0f', df_estados_24h_soma.vaccinated_second, grouping=True))
+    dados('Segunda dose:', formato(df_estados_24h_soma.vaccinated_second, 0))
     st.sidebar.progress(df_estados_24h_soma.vaccinated_second/214693448)
     st.sidebar.markdown("""---""")
     return None
