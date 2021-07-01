@@ -1,35 +1,39 @@
+## Péricles S. G. Marques
+
+## bibliotecas / config / covid.py
 import streamlit as st
+import locale
+locale.setlocale(locale.LC_ALL, "Portuguese_Brazil.1252")
 exec(open('covid.py', encoding="iso-8859-1").read())
 
 
-# reorganizando df
-df_base = df_estados_24h[["UF", "state", "Região", "newCases", "totalCases", "totalCases_per_100k_inhabitants", "newDeaths", "deaths", "deaths_per_100k_inhabitants", "deaths_by_totalCases", "tests", "tests_per_100k_inhabitants", "vaccinated", "vaccinated_per_100k_inhabitants", "vacinados_1a_dose", "vaccinated_second", "vaccinated_second_per_100k_inhabitants", "vacinados_2a_dose"]]
-df_base.reset_index(drop=True, inplace=True)
-df_base = df_base.rename(columns={
-                            "state": "Sigla",
-                            "newCases": "Novos casos",
-                            "totalCases": "Total de casos",
-                            "totalCases_per_100k_inhabitants": "Total de casos por 100 mil hab.",
-                            "newDeaths": "Novos óbitos",
-                            "deaths": "Total de óbitos",
-                            "deaths_per_100k_inhabitants": "Total de óbitos por 100 mil hab.",
-                            "deaths_by_totalCases": "Mortes por casos",
-                            "tests": "Nº testes",
-                            "tests_per_100k_inhabitants": "Testes por 100 mil hab.",
-                            "vaccinated": "Vacinados (1ª dose)",
-                            "vaccinated_per_100k_inhabitants": "Vacinados (1ª dose) por 100 mil hab.",
-                            "vacinados_1a_dose": "% Vacinados (1ª dose)",
-                            "vaccinated_second": "Vacinados (2ª dose)",
-                            "vaccinated_second_per_100k_inhabitants": "Vacinados (2ª dose) por 100 mil hab.",
-                            "vacinados_2a_dose": "% Vacinados (2ª dose)"})
-
-# Initial page config
-
+## Config
 st.set_page_config(
      page_title='COVID-19 Dashboard',
      layout="wide",
      initial_sidebar_state="expanded",
 )
+
+
+## funções/variáveis personalizadas
+def dados(text, number):
+     st.sidebar.markdown(f'<p>{text} <b style="background-color:#2c4d56;color:#09ab3b;font-size:18px;border-radius:0.25rem;">{number}</b></p>', unsafe_allow_html=True)
+
+def formato(n):
+    return locale.format('%.0f', n, grouping=True)
+
+vac1 = mapa_brasil(z = df_estados_24h.vaccinated_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
+                    title_text='Percentual de<br>vacinados com a 1ª dose.')
+
+vac2 = mapa_brasil(z = df_estados_24h.vaccinated_second_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
+                    title_text='Percentual de<br>vacinados com a 2ª dose.')
+
+casos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newCases.sort_values(ascending=False), hovertext=formato(df_estados_24h_soma.newCases),
+            title = "Casos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newCases)), xaxis_title="Estados", yaxis_title="Nº de casos")
+
+obitos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newDeaths, hovertext=formato(df_estados_24h_soma.newDeaths),
+            title = "Óbitos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newDeaths)), xaxis_title="Estados", yaxis_title="Nº de óbitos")
+
 
 
 
@@ -42,23 +46,29 @@ def main():
 # Thanks to streamlitopedia for the following code snippet
 
 
-# sidebar
-
+## sidebar
 def cs_sidebar():
     st.sidebar.header('COVID-19 Resumo')
-    st.sidebar.write('Óbitos nas últimas 24h:', brasil_mortos_dia.newDeaths)
-    st.sidebar.write('Óbitos totais:', brasil_mortos_dia.deaths)
-
-
+    dados('Dia:', ontem_str)
+    st.sidebar.markdown("""---""")
+    dados('Casos nas últimas 24h:', formato(df_estados_24h_soma.newCases))
+    dados('Óbitos nas últimas 24h:', formato(df_estados_24h_soma.newDeaths))
+    st.sidebar.markdown("""---""")
+    dados('Casos totais:', locale.format('%.0f', df_estados_24h_soma.totalCases, grouping=True))
+    dados('Óbitos totais:', locale.format('%.0f', df_estados_24h_soma.deaths, grouping=True))
+    st.sidebar.markdown("""---""")
+    dados('Vacinas aplicadas:', locale.format('%.0f', df_estados_24h_soma.vaccinated+df_estados_24h_soma.vaccinated_second, grouping=True))
+    dados('Primeira dose:', locale.format('%.0f', df_estados_24h_soma.vaccinated, grouping=True))
+    st.sidebar.progress(df_estados_24h_soma.vaccinated/214693448)
+    dados('Segunda dose:', locale.format('%.0f', df_estados_24h_soma.vaccinated_second, grouping=True))
+    st.sidebar.progress(df_estados_24h_soma.vaccinated_second/214693448)
+    st.sidebar.markdown("""---""")
     return None
 
-##########################
-# Main body of cheat sheet
-##########################
 
-def cs_body():
-    # Magic commands
-
+## body
+def cs_body():    
+    
     st.title('COVID-19 Dashboard')
     st.markdown("""
     #### By: [Péricles S. G. Marques](https://www.linkedin.com/in/periclessavio/)    
@@ -69,26 +79,37 @@ def cs_body():
     st.write(df_base)
 
     st.header('')
-    st.header('Óbitos nas últimas 24h')
-    st.plotly_chart(vbar_obitos24h, use_container_width=True)
-    st.plotly_chart(br_mapa_obitos24h, use_container_width=True)
+    st.header('Últimas 24 horas')
+    col1a, col2a = st.beta_columns(2)
+    col1a.plotly_chart(casos24h, use_container_width=True)
+    col2a.plotly_chart(obitos24h, use_container_width=True)   
 
-    st.header('')
-    st.header('Óbitos desde o início da pandemia')
-    st.plotly_chart(vbar_obitos, use_container_width=True)
-    st.plotly_chart(br_mapa_obitos, use_container_width=True)
+    # st.header('')
+    # st.header('Óbitos nas últimas 24h')
+    # st.plotly_chart(vbar_obitos24h, use_container_width=True)
+    # st.plotly_chart(br_mapa_obitos24h, use_container_width=True)
 
-    st.header('')
-    st.header('Vacinação (1ª dose)')
-    st.plotly_chart(vbar_vacinados1, use_container_width=True)
-    st.plotly_chart(brmapa_vacinados1, use_container_width=True)
-
-    st.header('')
-    st.header('Vacinação (2ª dose)')
-    st.plotly_chart(vbar_vacinados2, use_container_width=True)
-    st.plotly_chart(brmapa_vacinados2, use_container_width=True)
+    # st.header('')
+    # st.header('Óbitos desde o início da pandemia')
+    # st.plotly_chart(vbar_obitos, use_container_width=True)
+    # st.plotly_chart(br_mapa_obitos, use_container_width=True)
 
     
+    st.header('')
+    st.header('Vacinação')
+    col1, col2 = st.beta_columns(2)
+
+    
+    col1.subheader('Vacinação (1ª dose)')
+    #st.plotly_chart(vbar_vacinados1, use_container_width=True)
+    col1.plotly_chart(vac1, use_container_width=True)
+
+    col2.subheader('Vacinação (2ª dose)')
+    #st.plotly_chart(vbar_vacinados2, use_container_width=True)
+    col2.plotly_chart(vac2, use_container_width=True)    
+
+
+
 
     
 
@@ -100,3 +121,4 @@ def cs_body():
 
 if __name__ == '__main__':
     main()
+
