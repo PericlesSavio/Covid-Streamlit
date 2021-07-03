@@ -57,16 +57,24 @@ df_base = df_base.sort_values(by=['UF'], ascending=True).reset_index(drop=True, 
 
 
 ## funções personalizadas
-def mapa_brasil(z, hovertemplate, title_text):
-    return go.Figure(go.Choroplethmapbox(geojson=mapa_estados, locations=df_estados_24h.state, z=z, colorscale="rdylgn", marker_opacity=1, marker_line_width=1,
+def mapa_brasil(z, hovertemplate, title_text, colorscale):
+    return go.Figure(go.Choroplethmapbox(geojson=mapa_estados, locations=df_estados_24h.state, z=z, colorscale=colorscale, marker_opacity=1, marker_line_width=1,
                     hovertemplate = df_estados_24h.UF + "<br>"+hovertemplate)).update_layout({'plot_bgcolor': 'rgba(212, 218, 220, 255)',
                     'paper_bgcolor': 'rgba(212, 218, 220, 255)'}, font_color="black",mapbox_style="carto-positron", mapbox_zoom=2.9,
                     mapbox_center = {"lat": -15.3556, "lon": -56.0506}, title_text=title_text, title_y=0.1, margin={"r":0,"t":0,"l":0,"b":0})
+
 
 def barra_vertical(x, y, hovertext, title, xaxis_title, yaxis_title):
     return go.Figure(data=[go.Bar(x=x, y=y, hovertext=hovertext)]).update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
     marker_line_width=1.5, opacity=0.6).update_layout(title = title, xaxis_title=xaxis_title, yaxis_title=yaxis_title,
     hoverlabel=dict(bgcolor="white", font_size=16, font_family="Rockwell"))
+
+def barra_vertical2(x, y, hovertemplate, title, xaxis_title, yaxis_title):
+    return go.Figure(data=[go.Bar(x=x, y=y, hovertemplate=hovertemplate)]).update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
+    marker_line_width=1.5, opacity=0.6).update_layout(title = title, xaxis_title=xaxis_title, yaxis_title=yaxis_title,
+    hoverlabel=dict(bgcolor="white", font_size=16, font_family="Rockwell"))
+
+
 
 
     

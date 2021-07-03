@@ -21,17 +21,28 @@ def formato(n,d):
     return f'{n:_.{d}f}'.replace('.',',').replace('_','.')
 
 vac1 = mapa_brasil(z = df_estados_24h.vaccinated_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
-                    title_text='Percentual de<br>vacinados com a 1ª dose.')
+                    title_text='Percentual de<br>vacinados com a 1ª dose.', colorscale="rdylgn")
 
 vac2 = mapa_brasil(z = df_estados_24h.vaccinated_second_per_100_inhabitants, hovertemplate = 'Vacinados: %{z:.2f}%<extra></extra>',
-                    title_text='Percentual de<br>vacinados com a 2ª dose.')
+                    title_text='Percentual de<br>vacinados com a 2ª dose.', colorscale="rdylgn")
 
-casos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newCases.sort_values(ascending=False), hovertext=formato(df_estados_24h_soma.newCases, 0),
+casos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newCases.sort_values(ascending=False), hovertext='',
             title = "Casos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newCases, 0)), xaxis_title="Estados", yaxis_title="Nº de casos")
 
-obitos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newDeaths, hovertext=formato(df_estados_24h_soma.newDeaths, 0),
+obitos24h = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.newDeaths, hovertext='',
             title = "Óbitos nas últimas 24h (" + str(ontem_str) + "): " + str(formato(df_estados_24h_soma.newDeaths, 0)), xaxis_title="Estados", yaxis_title="Nº de óbitos")
 
+casos_100k = mapa_brasil(z = df_estados_24h.totalCases_per_100k_inhabitants, hovertemplate = 'Casos: %{z:.0f}<extra></extra>',
+            title_text="Casos por 100 mil hab.", colorscale="rdylgn_r")
+
+obitos_100k = mapa_brasil(z = df_estados_24h.deaths_per_100k_inhabitants, hovertemplate = 'Casos: %{z:.0f}<extra></extra>',
+            title_text="Óbitos por 100 mil hab.", colorscale="rdylgn_r")
+
+casos = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.totalCases.sort_values(ascending=False), hovertext='',
+            title = "Casos desde o início da pandemia", xaxis_title="Estados", yaxis_title="Nº de casos")
+
+obitos = barra_vertical(x=df_estados_24h.state, y=df_estados_24h.deaths.sort_values(ascending=False), hovertext='',
+            title = "Óbitos desde o início da pandemia", xaxis_title="Estados", yaxis_title="Nº de óbitos")
 
 
 
@@ -76,43 +87,44 @@ def cs_body():
     st.subheader('Base de dados')
     st.write(df_base)
 
+
     st.header('')
     st.header('Últimas 24 horas')
-    col1a, col2a = st.beta_columns(2)
-    col1a.plotly_chart(casos24h, use_container_width=True)
-    col2a.plotly_chart(obitos24h, use_container_width=True)   
+    st.markdown("""---""")
+    col1_24h, col2_24h = st.beta_columns(2)
+    col1_24h.plotly_chart(casos24h, use_container_width=True)
+    col2_24h.plotly_chart(obitos24h, use_container_width=True)
 
-    # st.header('')
-    # st.header('Óbitos nas últimas 24h')
-    # st.plotly_chart(vbar_obitos24h, use_container_width=True)
-    # st.plotly_chart(br_mapa_obitos24h, use_container_width=True)
 
-    # st.header('')
-    # st.header('Óbitos desde o início da pandemia')
-    # st.plotly_chart(vbar_obitos, use_container_width=True)
-    # st.plotly_chart(br_mapa_obitos, use_container_width=True)
+    st.header('')
+    st.header('Casos')
+    st.markdown("""---""")
+    col1_casos, col2_casos = st.beta_columns(2)
+    col1_casos.subheader('Casos totais')
+    col1_casos.plotly_chart(casos)
+    col2_casos.subheader('Casos por 100 mil hab.')
+    col2_casos.plotly_chart(casos_100k)
+
+
+    st.header('')
+    st.header('Óbitos')
+    st.markdown("""---""")
+    col1_obitos, col2_obitos = st.beta_columns(2)
+    col1_obitos.subheader('Óbitos totais')
+    col1_obitos.plotly_chart(obitos)
+    col2_obitos.subheader('Óbitos por 100 mil hab.')
+    col2_obitos.plotly_chart(obitos_100k)
 
     
     st.header('')
     st.header('Vacinação')
-    col1, col2 = st.beta_columns(2)
-
+    st.markdown("""---""")
+    col1_vac, col2_vac = st.beta_columns(2)    
+    col1_vac.subheader('Vacinação (1ª dose)')
+    col1_vac.plotly_chart(vac1, use_container_width=True)
+    col2_vac.subheader('Vacinação (2ª dose)')
+    col2_vac.plotly_chart(vac2, use_container_width=True)
     
-    col1.subheader('Vacinação (1ª dose)')
-    #st.plotly_chart(vbar_vacinados1, use_container_width=True)
-    col1.plotly_chart(vac1, use_container_width=True)
-
-    col2.subheader('Vacinação (2ª dose)')
-    #st.plotly_chart(vbar_vacinados2, use_container_width=True)
-    col2.plotly_chart(vac2, use_container_width=True)    
-
-
-
-
-    
-
-
-
     return None
 
 # Run main()
