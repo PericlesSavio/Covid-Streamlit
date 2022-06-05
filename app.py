@@ -80,7 +80,7 @@ def cs_body():
     
     st.title('COVID-19 Dashboard')
     st.markdown("""
-    #### By: [Péricles S. G. Marques](https://www.linkedin.com/in/periclessavio/)    
+    #### Por [Péricles S. G. Marques](https://www.linkedin.com/in/periclessavio/)    
     Web app feito em Python e Streamlit.    
     """)
     
