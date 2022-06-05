@@ -2,7 +2,7 @@
 
 ## bibliotecas / config / covid.py
 import streamlit as st
-import covid
+exec(open('covid.py', encoding="UTF-8").read())
 
 
 ## Config
