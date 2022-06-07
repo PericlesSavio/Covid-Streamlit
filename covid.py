@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 ## dataframes
 db_states = pd.read_csv("https://raw.githubusercontent.com/wcota/covid19br/master/cases-brazil-states.csv")
-mapa_estados = 'br_states.json'
+mapa_estados = 'https://raw.githubusercontent.com/PericlesSavio/Covid-Streamlit/main/br_states.json'
 brasil_pop = pd.read_csv('estados_pop.csv')
 db_states = pd.merge(db_states, brasil_pop, left_on='state',right_on='Sigla',how='outer',suffixes=('_left','_right'))
 
